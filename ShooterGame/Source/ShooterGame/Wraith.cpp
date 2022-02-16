@@ -4,6 +4,9 @@
 #include "Wraith.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 AWraith::AWraith() : 
@@ -18,17 +21,23 @@ AWraith::AWraith() :
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 200.f; // 봉 길이.
+	CameraBoom->TargetArmLength = 300.f; // 봉 길이.
 	CameraBoom->bUsePawnControlRotation = true; // 컨트롤러에서 입력되는 움직임에 따라 회전함
-	CameraBoom->SocketOffset = FVector(0.f, 60.f, 70.f);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // attach camera to end of boom
 	Camera->bUsePawnControlRotation = false; // camera does not rotate relative to arm
 
+
+	// 컨트롤러가 돌때 같이 돌지// 모두 false면 컨트롤러는 카메라에만 영향을줌
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true; // 인풋 넣어주는 방향으로 캐릭터가 움직임
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f); // 이 방향값만큼 속도로 돌아
+	GetCharacterMovement()->JumpZVelocity = 500.f; // 점프 힘
+	GetCharacterMovement()->AirControl = 0.2f; // 공중에서 움직일수있는 힘
 }
 
 // Called when the game starts or when spawned
@@ -73,6 +82,14 @@ void AWraith::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AWraith::FireWeapon()
+{
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySound2D(this, FireSound);
+	}
+}
+
 // Called every frame
 void AWraith::Tick(float DeltaTime)
 {
@@ -94,5 +111,6 @@ void AWraith::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction(TEXT("FireButton"), IE_Pressed, this, &AWraith::FireWeapon);
 }
 

@@ -34,6 +34,9 @@ protected:
 	// 마우스턴은 인풋컴포넌트에서 바로 넣었음
 	// 점프도 캐릭터에서 제공하는 기능으로 바로 했음
 
+	// 격발
+	void FireWeapon();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,4 +57,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float BaseLookUpRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	class USoundCue* FireSound;
 };
