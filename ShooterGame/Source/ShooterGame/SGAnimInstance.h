@@ -15,21 +15,22 @@ class SHOOTERGAME_API USGAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
-	// 블루프린트에서 연결해서 업데이트(Tick) 함수처럼 쓸 함수
+
+	// 블루프린트에서 update에연결해서 Tick 함수처럼 쓸 함수
+	// 매번 업데이트 관련 변수들 받을것
 	UFUNCTION(BlueprintCallable)
-		void UpdateAnimationProperties(float DeltaTime);
+	void UpdateAnimationProperties(float DeltaTime);
 
 	virtual void NativeInitializeAnimation() override;
 
 
 private:
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		class AWraith* Wraith;
+	class AWraith* Wraith;
 
 	// 캐릭터 스피드
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		float Speed;
+	float Speed;
 
 	// 캐릭터가 공중에 있는지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
@@ -49,5 +50,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		bool bAiming;
+
+public:
+	
 
 };

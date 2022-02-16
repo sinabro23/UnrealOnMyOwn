@@ -8,6 +8,7 @@
 
 void USGAnimInstance::UpdateAnimationProperties(float DeltaTime)
 {
+	// NativeInitializeAnimation 에서 wraith를 불러오지 못했다면
 	if (nullptr == Wraith)
 	{
 		Wraith = Cast<AWraith>(TryGetPawnOwner());
@@ -15,15 +16,15 @@ void USGAnimInstance::UpdateAnimationProperties(float DeltaTime)
 
 	if (Wraith)
 	{
-		// Get the lateral speed of the character from velocity
+		// 캐릭터의 속도
 		FVector Velocity{ Wraith->GetVelocity() };
 		Velocity.Z = 0; // 점프하거나 떨어지거나 할때의 속도는 넣지 않기 위해 0으로 설정
 		Speed = Velocity.Size();
 
-		// Is the Character in the air?
+		// 떠있는지 체크
 		bIsInAir = Wraith->GetCharacterMovement()->IsFalling();
 
-		// Is The Character accelerating?
+		// 가속하고있는지 체크
 		if (Wraith->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f)
 		{
 			bIsAccelerating = true;
@@ -33,22 +34,22 @@ void USGAnimInstance::UpdateAnimationProperties(float DeltaTime)
 			bIsAccelerating = false;
 		}
 
-		// 쳐다보고 있는 방향
-		FRotator AimRotation =
-			Wraith->GetBaseAimRotation();
+		//// 쳐다보고 있는 방향
+		//FRotator AimRotation =
+		//Wraith->GetBaseAimRotation();
 
-		FRotator MovementRotation =
-			UKismetMathLibrary::MakeRotFromX(
-				Wraith->GetVelocity());
+		//FRotator MovementRotation =
+		//	UKismetMathLibrary::MakeRotFromX(
+		//		Wraith->GetVelocity());
 
-		MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(
-			MovementRotation,
-			AimRotation).Yaw;
+		//MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(
+		//	MovementRotation,
+		//	AimRotation).Yaw;
 
-		if (Wraith->GetVelocity().Size() > 0)
-		{
-			LastMovementOffsetYaw = MovementOffsetYaw;
-		}
+		//if (Wraith->GetVelocity().Size() > 0)
+		//{
+		//	LastMovementOffsetYaw = MovementOffsetYaw;
+		//}
 
 		//bAiming = Wraith->GetAiming();
 	}
@@ -56,7 +57,5 @@ void USGAnimInstance::UpdateAnimationProperties(float DeltaTime)
 
 void USGAnimInstance::NativeInitializeAnimation()
 {
-	Wraith = Cast<AWraith>(TryGetPawnOwner());
-
+	Wraith = Cast<AWraith>(TryGetPawnOwner()); // 폰이 리턴되는 함수니깐 캐스트
 }
-

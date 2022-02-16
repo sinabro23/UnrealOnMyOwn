@@ -6,7 +6,9 @@
 #include "Camera/CameraComponent.h"
 
 // Sets default values
-AWraith::AWraith()
+AWraith::AWraith() : 
+	BaseTurnRate(40.f),
+	BaseLookUpRate(40.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -24,7 +26,9 @@ AWraith::AWraith()
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // attach camera to end of boom
 	Camera->bUsePawnControlRotation = false; // camera does not rotate relative to arm
 
-	
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = false;
 }
 
 // Called when the game starts or when spawned
@@ -39,10 +43,10 @@ void AWraith::MoveForward(float Value)
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is forward
-		const FRotator Rotation{ Controller->GetControlRotation() };
-		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
+		const FRotator Rotation{ Controller->GetControlRotation() }; // 컨트롤러의 로테이션 기준으로 앞으로가야함
+		const FRotator YawRotation{ 0, Rotation.Yaw, 0 }; //컨트롤러의 Yaw값만 중요하니깐
 
-		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
+		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) }; // X가 언리얼기준 정면
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -51,8 +55,6 @@ void AWraith::MoveRight(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		// find out which way is right
-		// 외적?과 관련된것 같은데 잘 모르겠다.
 		const FRotator Rotation{ Controller->GetControlRotation() };
 		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
 
@@ -61,34 +63,14 @@ void AWraith::MoveRight(float Value)
 	}
 }
 
-void AWraith::Turn(float Value)
+void AWraith::TurnAtRate(float Rate)
 {
-	//float TurnScaleFactor{};
-
-	//if (bAiming)
-	//{
-	//	TurnScaleFactor = MouseAimingTurnRate;
-	//}
-	//else
-	//{
-	//	TurnScaleFactor = MouseHipTurnRate;
-	//}
-	AddControllerYawInput(Value );
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AWraith::LookUp(float Value)
+void AWraith::LookUpAtRate(float Rate)
 {
-	//float LookUpScaleFactor{};
-
-	//if (bAiming)
-	//{
-	//	LookUpScaleFactor = MouseAimingLookUpRate;
-	//}
-	//else
-	//{
-	//	LookUpScaleFactor = MouseHipLookUpRate;
-	//}
-	AddControllerPitchInput(Value);
+	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
 // Called every frame
@@ -105,7 +87,12 @@ void AWraith::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AWraith::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AWraith::MoveRight);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AWraith::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AWraith::Turn);
+	PlayerInputComponent->BindAxis(TEXT("TurnRate"), this, &AWraith::TurnAtRate);
+	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AWraith::LookUpAtRate);
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
 }
 
