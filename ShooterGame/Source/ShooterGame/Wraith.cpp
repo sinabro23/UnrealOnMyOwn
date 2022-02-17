@@ -104,6 +104,8 @@ void AWraith::FireWeapon()
 
 	if (FireWeaponMontage && AnimInstance)
 	{
+		// 몽타주를 애니메이션 중간에 디폴트 슬롯으로 가로채도 
+		// 몽타주의 블렌드타임을 0으로 설정하지않으면 느리게 바뀌어서 이상했음.
 		AnimInstance->Montage_Play(FireWeaponMontage);
 		AnimInstance->Montage_JumpToSection(FName("FireStart")); // 다시 돌아오게 하는거구나
 	}
