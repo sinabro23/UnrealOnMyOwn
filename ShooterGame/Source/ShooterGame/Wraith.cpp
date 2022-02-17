@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 AWraith::AWraith() : 
@@ -87,6 +88,24 @@ void AWraith::FireWeapon()
 	if (FireSound)
 	{
 		UGameplayStatics::PlaySound2D(this, FireSound);
+	}
+
+	const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName(FName("BarrelSocket"));
+	if (BarrelSocket)
+	{
+		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(GetMesh());
+		if (MuzzleFlash)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+		}
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (FireWeaponMontage && AnimInstance)
+	{
+		AnimInstance->Montage_Play(FireWeaponMontage);
+		AnimInstance->Montage_JumpToSection(FName("FireStart")); // 다시 돌아오게 하는거구나
 	}
 }
 
