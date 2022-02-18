@@ -8,11 +8,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AWraith::AWraith() : 
 	BaseTurnRate(40.f),
-	BaseLookUpRate(40.f)
+	BaseLookUpRate(40.f),
+	RangeFromBarrel(50'000.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -97,6 +99,21 @@ void AWraith::FireWeapon()
 		if (MuzzleFlash)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+		}
+
+		FHitResult HitResult;
+		const FVector Start = SocketTransform.GetLocation();
+		// end를 구하기위해서는 정면방향인 X축으로 방향벡터를 구해서 길이만큼 곱해줘야함.
+		const FQuat Rotation = SocketTransform.GetRotation();
+		FVector RotationXAxis = Rotation.GetAxisX(); //************ 몰랐던것
+		const FVector End = Start + (RotationXAxis * RangeFromBarrel);
+
+		GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+		
+		if (HitResult.bBlockingHit) // 맞았을경우 디버그를 위해
+		{
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+			DrawDebugPoint(GetWorld(), HitResult.Location, 5.f, FColor::Red, false, 2.f);
 		}
 	}
 

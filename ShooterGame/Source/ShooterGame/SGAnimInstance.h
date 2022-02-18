@@ -34,22 +34,22 @@ private:
 
 	// 캐릭터가 공중에 있는지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		bool bIsInAir;
+	bool bIsInAir;
 
 	// 캐릭터가 움직이고 있는지
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		bool bIsAccelerating;
+	bool bIsAccelerating;
 
 	// 와리가리 하기 위한 Yaw offset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		float MovementOffsetYaw;
+	float MovementOffsetYaw;
 
 	// stop애니메이션에 쓸 오프셋을 기억하고 있기위해 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		float LastMovementOffsetYaw;
+	float LastMovementOffsetYaw;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-		bool bAiming;
+	bool bAiming;
 
 public:
 	

@@ -66,4 +66,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* FireWeaponMontage;
+
+	float RangeFromBarrel;
 };
