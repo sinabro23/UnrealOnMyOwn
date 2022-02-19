@@ -24,8 +24,9 @@ AWraith::AWraith() :
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.f; // 봉 길이.
+	CameraBoom->TargetArmLength = 150.f; // 봉 길이.
 	CameraBoom->bUsePawnControlRotation = true; // 컨트롤러에서 입력되는 움직임에 따라 회전함
+	CameraBoom->SocketOffset = FVector(0.f, 50.f, 70.f);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // attach camera to end of boom
@@ -34,7 +35,7 @@ AWraith::AWraith() :
 
 	// 컨트롤러가 돌때 같이 돌지// 모두 false면 컨트롤러는 카메라에만 영향을줌
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; // 인풋 넣어주는 방향으로 캐릭터가 움직임
@@ -101,20 +102,29 @@ void AWraith::FireWeapon()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
 
-		FHitResult HitResult;
-		const FVector Start = SocketTransform.GetLocation();
-		// end를 구하기위해서는 정면방향인 X축으로 방향벡터를 구해서 길이만큼 곱해줘야함.
-		const FQuat Rotation = SocketTransform.GetRotation();
-		FVector RotationXAxis = Rotation.GetAxisX(); //************ 몰랐던것
-		const FVector End = Start + (RotationXAxis * RangeFromBarrel);
-
-		GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+		// 화면 가운데 위치를 구하기 위해.
+		FVector ViewportSize;
 		
-		if (HitResult.bBlockingHit) // 맞았을경우 디버그를 위해
-		{
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-			DrawDebugPoint(GetWorld(), HitResult.Location, 5.f, FColor::Red, false, 2.f);
-		}
+
+		//FHitResult HitResult;
+		//const FVector Start = SocketTransform.GetLocation();
+		//// end를 구하기위해서는 정면방향인 X축으로 방향벡터를 구해서 길이만큼 곱해줘야함.
+		//const FQuat Rotation = SocketTransform.GetRotation();
+		//FVector RotationXAxis = Rotation.GetAxisX(); //************ 몰랐던것
+		//const FVector End = Start + (RotationXAxis * RangeFromBarrel);
+
+		//GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+		//
+		//if (HitResult.bBlockingHit) // 맞았을경우 bBlockingHit true
+		//{
+		//	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+		//	DrawDebugPoint(GetWorld(), HitResult.Location, 5.f, FColor::Red, false, 2.f);
+		//	
+		//	if(ImpactParicle)
+		//	{
+		//		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParicle, HitResult.Location);
+		//	}
+		//}
 	}
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
